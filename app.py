@@ -516,10 +516,14 @@ def create_show_submission():
                                                      Availability.end_at >= end_time).first()
             if availability:
                 show_collide = Show.query.filter(and_(Show.artist_id == artist.id,
-                                                      or_(and_(Show.start_time <= start_time, Show.end_time >= end_time),
-                                                          and_(Show.start_time >= start_time, Show.end_time <= end_time),
-                                                          and_(Show.start_time <= start_time, Show.end_time >= start_time),
-                                                          and_(Show.start_time <= end_time, Show.end_time >= end_time), ))
+                                                      or_(and_(Show.start_time <= start_time,
+                                                               Show.end_time >= end_time),
+                                                          and_(Show.start_time >= start_time,
+                                                               Show.end_time <= end_time),
+                                                          and_(Show.start_time <= start_time,
+                                                               Show.end_time >= start_time),
+                                                          and_(Show.start_time <= end_time,
+                                                               Show.end_time >= end_time), ))
                                                  ).first()
                 if not show_collide:
                     show = Show(artist_id=artist.id, venue_id=venue.id, start_time=start_time, end_time=end_time)
@@ -625,9 +629,27 @@ if not app.debug:
     app.logger.addHandler(file_handler)
     app.logger.info('errors')
 
+
 # ----------------------------------------------------------------------------#
 # Launch.
 # ----------------------------------------------------------------------------#
+
+def initial_genres():
+    genres_list = ['Alternative', 'Blues', 'Classical', 'Country',
+                   'Electronic', 'Folk', 'Funk', 'Hip-Hop',
+                   'Heavy Metal', 'Instrumental', 'Jazz', 'Musical Theatre',
+                   'Pop', 'Punk', 'R&B', 'Reggae', 'Rock n Roll', 'Soul', 'Other']
+    for genres in genres_list:
+        genres_exist = Genres.query.filter_by(name=genres).first()
+        print(genres_exist)
+        if not genres_exist:
+            g = Genres(name=genres)
+            db.session.add(g)
+        else:
+            print(genres)
+    db.session.commit()
+    db.session.close()
+
 
 # Default port:
 if __name__ == '__main__':
